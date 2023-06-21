@@ -1,0 +1,48 @@
+ WARN  `node_modules` is present. Lockfile only installation will make it out-of-date
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Progress: resolved 30, reused 29, downloaded 0, added 0
+Progress: resolved 32, reused 31, downloaded 0, added 0
+Progress: resolved 32, reused 32, downloaded 0, added 0
+Progress: resolved 58, reused 50, downloaded 0, added 0
+Progress: resolved 115, reused 97, downloaded 1, added 0
+ WARN  deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+Progress: resolved 164, reused 143, downloaded 1, added 0
+Progress: resolved 283, reused 270, downloaded 1, added 0
+Progress: resolved 382, reused 380, downloaded 1, added 0
+ WARN  deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+ WARN  deprecated uglify-es@3.3.9: support for ECMAScript is superseded by `uglify-js` as of v3.13.0
+Progress: resolved 531, reused 529, downloaded 1, added 0
+ WARN  deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs
+Progress: resolved 741, reused 736, downloaded 1, added 0
+Progress: resolved 912, reused 908, downloaded 1, added 0
+ WARN  deprecated source-map-resolve@0.5.3: See https://github.com/lydell/source-map-resolve#deprecated
+ WARN  deprecated resolve-url@0.2.1: https://github.com/lydell/resolve-url#deprecated
+ WARN  deprecated source-map-url@0.4.1: See https://github.com/lydell/source-map-url#deprecated
+ WARN  deprecated urix@0.1.0: Please see https://github.com/lydell/urix#deprecated
+Progress: resolved 1137, reused 1135, downloaded 1, added 0
+
+dependencies:
++ react-native-reanimated ^3.1.0
+
+ WARN  Issues with peer dependencies found
+.
+└─┬ react-native-reanimated 3.1.0
+  ├── ✕ missing peer @babel/plugin-proposal-nullish-coalescing-operator@^7.0.0-0
+  ├── ✕ missing peer @babel/plugin-proposal-optional-chaining@^7.0.0-0
+  ├── ✕ missing peer @babel/plugin-transform-arrow-functions@^7.0.0-0
+  ├── ✕ missing peer @babel/plugin-transform-shorthand-properties@^7.0.0-0
+  └── ✕ missing peer @babel/plugin-transform-template-literals@^7.0.0-0
+Peer dependencies that should be installed:
+  @babel/plugin-proposal-nullish-coalescing-operator@^7.0.0-0
+  @babel/plugin-proposal-optional-chaining@^7.0.0-0
+  @babel/plugin-transform-arrow-functions@^7.0.0-0
+  @babel/plugin-transform-shorthand-properties@^7.0.0-0
+  @babel/plugin-transform-template-literals@^7.0.0-0
+
+Packages: +1296
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 1137, reused 1135, downloaded 1, added 1
+Progress: resolved 1137, reused 1135, downloaded 1, added 3
+Progress: resolved 1137, reused 1135, downloaded 1, added 5
+Progress: resolved 1137, reused 1135, downloaded 1, added 5, done
+Done in 18.5s
