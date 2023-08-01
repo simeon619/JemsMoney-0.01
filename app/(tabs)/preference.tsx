@@ -15,14 +15,17 @@ import { MonoText } from "../../components/StyledText";
 import { ScrollView, View } from "../../components/Themed";
 
 import { useRouter } from "expo-router";
-import { useDispatch, useSelector } from "react-redux";
+
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from "../../fonctionUtilitaire/metrics";
-import { RootState } from "../../store";
-import { setPreferences } from "../../store/preference/preferenceSlice";
+import { Queries_Key } from "../../store";
+import { CountryInterface } from "../../store/Descriptions";
+import { usePreferenceStore } from "../../store/preference/preferenceSlice";
+import { queryClient } from "../_layout";
+
 const SECTIONS = [
   {
     header: "Profile",
@@ -47,14 +50,22 @@ const SECTIONS = [
 ];
 
 const PreferenceScreen = () => {
-  const dispatch = useDispatch();
-  let preference = useSelector((state: RootState) => state.preference);
-  let rates = useSelector((state: RootState) => state.entreprise.rates);
-  console.log({ preference });
-  const country = useSelector((state: RootState) => state.country);
+  const { setPreferences, language, currency, darkMode, name } =
+    usePreferenceStore();
+
+  const country = queryClient.getQueryData([
+    Queries_Key.countries,
+  ]) as CountryInterface[];
+
+  // country.
+
+  // const dispatch = useDispatch();
+  // let preference = useSelector((state: RootState) => state.preference);
+  // let rates = useSelector((state: RootState) => state.entreprise.rates);
+  // console.log({ preference });
+  // const country = useSelector((state: RootState) => state.country);
   let route = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-
   const openModal = () => {
     setModalVisible(true);
   };
@@ -71,13 +82,11 @@ const PreferenceScreen = () => {
     return (
       <TouchableOpacity
         onPress={() => {
-          dispatch(
-            setPreferences({
-              ...preference,
-              country: { name: countr.name, id: countr.id },
-              currency: countr.currency,
-            })
-          );
+          setPreferences({
+            country: { name: countr.name, id: countr._id },
+            currency: countr.currency,
+          });
+
           closeModal();
         }}
         style={{
@@ -227,7 +236,7 @@ const PreferenceScreen = () => {
                               style={styles.rowValue}
                             >
                               {id === "country"
-                                ? preference[id]?.name
+                                ? name
                                 : //@ts-ignore
                                   preference[id]}
                             </MonoText>
@@ -236,12 +245,9 @@ const PreferenceScreen = () => {
                           {type === "toggle" && (
                             <Switch
                               onChange={(val) => {
-                                dispatch(
-                                  setPreferences({
-                                    ...preference,
-                                    [id]: val.nativeEvent.value,
-                                  })
-                                );
+                                setPreferences({
+                                  [id]: val.nativeEvent.value,
+                                });
                               }}
                               //@ts-ignore
                               value={preference[id]}

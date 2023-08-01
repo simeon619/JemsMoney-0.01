@@ -36,13 +36,13 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useDispatch, useSelector } from "react-redux";
+
 import ImageRatio from "../components/ImageRatio";
 import InstanceAudio from "../components/InstanceAudio";
 import { MonoText } from "../components/StyledText";
 import { Text, View } from "../components/Themed";
 import Colors from "../constants/Colors";
-import { HOST } from "../constants/data";
+import { HOST, LIMIT_TRANSACTION } from "../constants/data";
 import { formatDate } from "../fonctionUtilitaire/date";
 import {
   horizontalScale,
@@ -50,10 +50,11 @@ import {
   verticalScale,
 } from "../fonctionUtilitaire/metrics";
 import { isObjectNotEmpty } from "../fonctionUtilitaire/utils";
-import { AppDispatch, RootState } from "../store";
+
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { Queries_Key } from "../store";
 import {
   MessageDataSchema,
-  MessageSchema,
   addMessage,
   fetchMessages,
 } from "../store/message/messageSlice";
@@ -78,39 +79,46 @@ const discussion = () => {
   const params = useSearchParams();
   const [recording, setRecording] = useState<Audio.Recording>();
 
-  const dispatch: AppDispatch = useDispatch();
   const id = useRef<string>(params.id as string).current;
-  const [messages, setMessages] = useState<MessageSchema>({});
+  // const [messages, setMessages] = useState<MessageSchema>({});
 
-  console.log(
-    "🚀 ~ file: discussion.tsx:8780 ~ discussion ~ id:",
-    id,
-    typeof id
-  );
-
-  const { discussions, loading, success } = useSelector(
-    (state: RootState) => state.message
-  );
-  console.log(
-    "🚀 ~ file: discussion.tsx:83 ~ discussion ~ Messsages:",
-    discussions
-  );
-
-  useEffect(() => {
-    if (!discussions[id]) {
-      setMessages({});
-    } else {
-      setMessages(discussions[id]);
-      console.log(
-        "🚀 ~ file: discussion.tsx:105 ~ useEffect ~ discussions:",
-        discussions
-      );
+  const {
+    data: messages,
+    status,
+    fetchNextPage,
+    isError,
+    isLoading,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    [Queries_Key.message, id],
+    () => fetchMessages(LIMIT_TRANSACTION, id, ""),
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        const nextPage =
+          lastPage.length === LIMIT_TRANSACTION
+            ? allPages.length + 1
+            : undefined;
+        return nextPage;
+      },
+      keepPreviousData: true,
     }
-  }, [discussions]);
+  );
+
+  const MessageU = useMutation([Queries_Key.message, id], addMessage);
+
+  // useEffect(() => {
+  //   if (!discussions[id]) {
+  //     setMessages({});
+  //   } else {
+  //     setMessages(discussions[id]);
+  //     console.log(
+  //       "🚀 ~ file: discussion.tsx:105 ~ useEffect ~ discussions:",
+  //       discussions
+  //     );
+  //   }
+  // }, [discussions]);
   // console.log(Object.values(messages), "gfdg5df4g54gdf");
-  Object.keys(messages).forEach((key) => {
-    console.log(key, "@kjfkdfjkdhf565965@@@@@@");
-  });
+
   const regex = new RegExp(/[^\s\r\n]/g);
 
   async function startRecording() {
@@ -202,21 +210,19 @@ const discussion = () => {
       const base64 = await FileSystem.readAsStringAsync(pathVoiceNote, {
         encoding: FileSystem.EncodingType.Base64,
       });
+      MessageU.mutate({
+        //@ts-ignore
+        discussionId: params.id,
+        messageFile: [
+          {
+            buffer: base64,
+            type: "audio/m4a",
+            size: fileInfo.size,
+            fileName: name,
+          },
+        ],
+      });
 
-      dispatch(
-        addMessage({
-          //@ts-ignore
-          discussionId: params.id,
-          messageFile: [
-            {
-              buffer: base64,
-              type: "audio/m4a",
-              size: fileInfo.size,
-              fileName: name,
-            },
-          ],
-        })
-      );
       setPathVoiceNote(null);
       console.log("audio send");
     }
@@ -250,13 +256,12 @@ const discussion = () => {
             size: 1500,
           };
         });
-      dispatch(
-        addMessage({
-          //@ts-ignore
-          discussionId: params.id,
-          messageFile: fileImages,
-        })
-      );
+
+      MessageU.mutate({
+        //@ts-ignore
+        discussionId: params.id,
+        messageFile: fileImages,
+      });
     } else {
       Alert.prompt("You did not select any image.");
     }
@@ -621,13 +626,11 @@ const discussion = () => {
                   style={{}}
                   onPress={() => {
                     if (text && regex.test(text)) {
-                      dispatch(
-                        addMessage({
-                          //@ts-ignore
-                          discussionId: params.id,
-                          messageText: text,
-                        })
-                      );
+                      MessageU.mutate({
+                        messageText: text,
+                        discussionId: id,
+                      });
+
                       setText("");
                     }
                   }}

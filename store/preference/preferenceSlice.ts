@@ -1,39 +1,30 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { PURGE } from "redux-persist";
-
-let initialState: {
+import { create } from "zustand";
+// Define types for the state
+interface PreferenceState {
   language: string;
   darkMode: boolean;
-  currency: string;
   name: string;
-  country: { name: string; id: string };
-} = {
+  currency: string;
+  country: { id: string; name: string };
+}
+
+// Define types for the actions
+interface PreferenceActions {
+  setPreferences: (value: Partial<PreferenceState>) => void;
+}
+
+// Combine state and actions types into one
+type PreferenceStore = PreferenceState & PreferenceActions;
+
+export const usePreferenceStore = create<PreferenceStore>((set) => ({
   language: "francais",
   darkMode: false,
   currency: "RUB",
-  name: "jean",
+  name: "",
   country: { id: "", name: "" },
-};
-const preferenceSlice = createSlice({
-  name: "preference",
-  initialState: { ...initialState },
-  reducers: {
-    setPreferences: (state, action) => {
-      let value = action.payload;
-      console.log("🚀 ~ file: preferenceSlice.ts:16 ~ value:", value);
-
-      state.darkMode = value.darkMode;
-      state.currency = value.currency;
-      state.language = value.language;
-      state.name = value.name;
-      state.country = value.country;
-    },
-  },
-
-  extraReducers: (builder) => {
-    builder.addCase(PURGE, () => initialState);
-  },
-});
-export const { setPreferences } = preferenceSlice.actions;
-
-export default preferenceSlice.reducer;
+  setPreferences: (value) =>
+    set((state) => ({
+      ...state,
+      ...value, // Use partial object spread to merge the new values
+    })),
+}));

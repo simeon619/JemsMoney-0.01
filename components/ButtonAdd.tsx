@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { useDispatch, useSelector } from "react-redux";
+
 import Colors from "../constants/Colors";
 import {
   horizontalScale,
@@ -17,7 +17,7 @@ import {
   verticalScale,
 } from "../fonctionUtilitaire/metrics";
 import { TransactionServer } from "../fonctionUtilitaire/type";
-import { AppDispatch, RootState } from "../store";
+
 import { addDiscussion } from "../store/message/messageSlice";
 import { startTransaction } from "../store/transaction/transactionSlice";
 const ButtonAdd = ({
@@ -33,14 +33,14 @@ const ButtonAdd = ({
 }) => {
   const colorScheme = useColorScheme();
   const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
-  let dispatch: AppDispatch = useDispatch();
+
   const handleKeyboardDidShow = () => {
     setKeyboardVisible(true);
   };
   const [isClicked, setIsCliked] = useState(false);
-  const { discussions, loading, success } = useSelector(
-    (state: RootState) => state.message
-  );
+  // const { discussions, loading, success } = useSelector(
+  //   (state: RootState) => state.message
+  // );
   const handleKeyboardDidHide = () => {
     setKeyboardVisible(false);
   };

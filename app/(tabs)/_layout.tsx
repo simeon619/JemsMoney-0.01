@@ -9,7 +9,7 @@ import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { memo } from "react";
 import { Pressable, useColorScheme, useWindowDimensions } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+
 import { MonoText } from "../../components/StyledText";
 import { View } from "../../components/Themed";
 import Colors from "../../constants/Colors";
@@ -18,10 +18,12 @@ import {
   moderateScale,
   verticalScale,
 } from "../../fonctionUtilitaire/metrics";
-import { fetchUser } from "../../store/auth/authSlice";
 
 import { AntDesign } from "@expo/vector-icons";
-import { AppDispatch, RootState } from "../../store";
+
+import { Queries_Key } from "../../store";
+import { AccountInterface } from "../../store/Descriptions";
+import { queryClient } from "../_layout";
 import EventScreen from "./event";
 import Home from "./index";
 import PreferenceScreen from "./preference";
@@ -35,10 +37,12 @@ export function DrawerItemIcon(props: {
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = memo((props: any) => {
-  const { account } = useSelector((state: RootState) => state.auth);
+  // const { account } = useSelector((state: RootState) => state.auth);
+  const account = queryClient.getQueryData([
+    Queries_Key.user,
+  ]) as AccountInterface;
   const { height, width } = useWindowDimensions();
-  console.log({ account });
-  const dispatch: AppDispatch = useDispatch();
+
   return (
     <View lightColor="#21263a" darkColor="#21263a" style={{ flex: 1 }}>
       <DrawerContentScrollView
@@ -80,9 +84,7 @@ const CustomDrawerContent = memo((props: any) => {
           gap: horizontalScale(20),
         }}
         onPress={() => {
-          dispatch(
-            fetchUser({ telephone: "+2250565848273", password: "2567" })
-          );
+          queryClient.removeQueries();
         }}
       >
         <Entypo name="log-out" size={28} color={"#eee"} />

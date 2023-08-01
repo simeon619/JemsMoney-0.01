@@ -13,7 +13,7 @@ import {
 import Spinner from "react-native-loading-spinner-overlay/lib";
 import { magicModal } from "react-native-magic-modal";
 import Animated from "react-native-reanimated";
-import { useDispatch, useSelector } from "react-redux";
+
 import { MonoText } from "../../components/StyledText";
 import { ScrollView, Text, View } from "../../components/Themed";
 import Colors from "../../constants/Colors";
@@ -24,13 +24,16 @@ import {
   shadow,
   verticalScale,
 } from "../../fonctionUtilitaire/metrics";
-import { AppDispatch, RootState } from "../../store";
+
+import { useMutation } from "@tanstack/react-query";
 import { fetchUser } from "../../store/auth/authSlice";
 
 const login = () => {
-  const { loading, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { data, mutate, isLoading } = useMutation({
+    mutationFn: fetchUser,
+    mutationKey: ["user"],
+  });
+
   const { height, width } = useWindowDimensions();
   const [password, setPassword] = useState<string>("2569");
   const [step, setStep] = useState<"1" | "2" | "3">("1");
@@ -45,13 +48,11 @@ const login = () => {
   const navigationState = useRootNavigationState();
   useEffect(() => {
     if (!navigationState?.key) return;
-    if (isAuthenticated) {
-      console.log("gerone");
+    if (data?._id) {
       router.replace("(tabs)");
     }
-  }, [isAuthenticated, navigationState?.key]);
+  }, [data?._id, navigationState?.key]);
 
-  const dispatch: AppDispatch = useDispatch();
   const ResponseModal = () => {
     const renderItem = ({
       item,
@@ -127,7 +128,7 @@ const login = () => {
   }, [validTel, password]);
 
   const logIn = () => {
-    dispatch(fetchUser({ telephone: phoneNumber, password }));
+    mutate({ telephone: phoneNumber, password });
   };
   return (
     <>
@@ -308,9 +309,10 @@ const login = () => {
         </Animated.View>
 
         <Spinner
-          visible={loading}
+          visible={isLoading}
           textContent={"Loading..."}
           cancelable={false}
+          size={"small"}
         />
         <View
           lightColor="#f6f7fb"

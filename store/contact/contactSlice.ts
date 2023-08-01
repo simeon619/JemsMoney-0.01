@@ -1,18 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { create } from "zustand";
 import { ContactShema } from "../../app/modal";
 
-let initialState: ContactShema[] = [];
+interface ContactState {
+  contacts: ContactShema[];
+  addContact: (contacts: ContactShema[]) => void;
+}
 
-export const contactSlice = createSlice({
-  name: "contact",
-  initialState: initialState,
-  reducers: {
-    addContact: (state, action) => {
-      return (state = state.concat(...action.payload));
-    },
+const useContactStore = create<ContactState>((set) => ({
+  contacts: [],
+  addContact: (newContacts) => {
+    set((state) => ({ contacts: [...state.contacts, ...newContacts] }));
   },
-});
+}));
 
-export const { addContact } = contactSlice.actions;
-
-export default contactSlice.reducer;
+export default useContactStore;

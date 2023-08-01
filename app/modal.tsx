@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import { Text, View } from "../components/Themed";
 import Colors from "../constants/Colors";
 import {
@@ -22,7 +21,9 @@ import {
   shadow,
   verticalScale,
 } from "../fonctionUtilitaire/metrics";
-import { AppDispatch, RootState } from "../store";
+
+import { useMutation } from "@tanstack/react-query";
+import useContactStore from "../store/contact/contactSlice";
 import { fetchContacts } from "../store/contact/fetchhContact";
 import { startTransaction } from "../store/transaction/transactionSlice";
 
@@ -35,16 +36,36 @@ export default function ModalScreen() {
   // const [listContact, setListContact] = useState<ContactShema[]>([]);
   const { height, width } = useWindowDimensions();
   const [value, onChangeText] = useState("");
+  const { contacts } = useContactStore((state) => state);
+
   const colorScheme = useColorScheme();
   let router = useRouter();
-  let dispatch: AppDispatch = useDispatch();
-  let listContact = useSelector((state: RootState) => state.contact);
+  // let dispatch: AppDispatch = useDispatch();
+  // let listContact = useSelector((state: RootState) => state.contact);
+
+  const { mutate } = useMutation(
+    ["startTransaction"],
+    () => startTransaction(),
+    {
+      onSuccess: () => {
+        router.push({
+          pathname: "/formTransaction",
+          params: {
+            type: "contact",
+            // name: contact.name,
+            // id: contact.id,
+            // number: contact.phoneNumbers[0].number,
+          },
+        });
+      },
+    }
+  );
 
   useEffect(() => {
-    fetchContacts(listContact, dispatch);
+    fetchContacts(contacts);
   }, []);
   const contactFind = useMemo(() => {
-    return listContact?.filter((contact) => {
+    return contacts?.filter((contact) => {
       const searchTextLowerCase = value?.toLowerCase();
 
       return (
@@ -55,7 +76,7 @@ export default function ModalScreen() {
         //
       );
     });
-  }, [value, listContact]);
+  }, [value, contacts]);
 
   // console.log(contactFind.phoneNumbers[0].number, "dagobert");
 
@@ -73,16 +94,7 @@ export default function ModalScreen() {
           shadow(0),
         ]}
         onPress={() => {
-          dispatch(startTransaction());
-          router.push({
-            pathname: "/formTransaction",
-            params: {
-              type: "contact",
-              name: contact.name,
-              id: contact.id,
-              number: contact.phoneNumbers[0].number,
-            },
-          });
+          mutate();
         }}
       >
         <Image

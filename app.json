@@ -15,12 +15,21 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {},
+    "ios": {
+      "infoPlist": {
+        "NSContactsUsageDescription": "Allow $(PRODUCT_NAME) to access your contacts."
+      }
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
+      ],
+      "package": "com.anonymous.JemsMoney"
     },
     "web": {
       "bundler": "metro",

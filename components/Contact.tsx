@@ -13,7 +13,7 @@ import {
   useColorScheme,
 } from "react-native";
 import { MagicModalPortal, magicModal } from "react-native-magic-modal";
-import { useDispatch, useSelector } from "react-redux";
+
 import Colors from "../constants/Colors";
 import { normeFormat } from "../fonctionUtilitaire/data";
 import { formatAmount } from "../fonctionUtilitaire/formatAmount";
@@ -24,7 +24,7 @@ import {
   verticalScale,
 } from "../fonctionUtilitaire/metrics";
 import { TransactionServer } from "../fonctionUtilitaire/type";
-import { AppDispatch, RootState } from "../store";
+
 import { Agency } from "../store/country/countrySlice";
 import { updateTransaction } from "../store/transaction/transactionSlice";
 import { MonoText } from "./StyledText";
@@ -56,6 +56,7 @@ const Contact = ({
   changeFrame: (page: number) => void;
 }) => {
   const country = useSelector((state: RootState) => state.country);
+
   const { rates, serviceCharge } = useSelector(
     (state: RootState) => state.entreprise
   );

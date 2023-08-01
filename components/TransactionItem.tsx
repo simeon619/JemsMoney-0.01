@@ -1,13 +1,13 @@
 import { Entypo } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import {
   TouchableOpacity,
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+
 import Colors from "../constants/Colors";
 import { formatDate } from "../fonctionUtilitaire/date";
 import { formatAmount } from "../fonctionUtilitaire/formatAmount";
@@ -17,58 +17,42 @@ import {
   shadow,
   verticalScale,
 } from "../fonctionUtilitaire/metrics";
-import { AppDispatch, RootState } from "../store";
+
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../app/_layout";
+import { TransactionInterface } from "../store/Descriptions";
 import { addDiscussion } from "../store/message/messageSlice";
-import { transactionDataSchema } from "../store/transaction/transactionSlice";
 import { MonoText } from "./StyledText";
 import { View } from "./Themed";
 let color = "#fafafa";
+
+let router = useRouter();
+
 const TransactionItem = ({
   dataTransaction,
 }: {
-  dataTransaction: transactionDataSchema;
+  dataTransaction: TransactionInterface;
 }) => {
   const { height, width } = useWindowDimensions();
+
+  const { mutate, isLoading, data, isError } = useMutation(
+    ["addDiscussion", dataTransaction._id],
+    () => addDiscussion(dataTransaction._id),
+    {
+      onSuccess: () => {
+        queryClient.refetchQueries(["transaction", dataTransaction._id]);
+        router.push({
+          pathname: "/discussion",
+          params: { id: dataTransaction.discussion },
+        });
+      },
+    }
+  );
   const colorScheme = useColorScheme();
   let ColorTransaction = determineStatus(
     dataTransaction.status.toLocaleLowerCase()
   );
-  console.log(
-    "🚀 ~ file: TransactionItem.tsx:31 ~ dataTransaction:",
-    dataTransaction
-  );
-  useSelector((state: RootState) => state.transation);
-  const [isClicked, setIsCliked] = useState(false);
-  const { discussions, loading, success } = useSelector(
-    (state: RootState) => state.message
-  );
-  console.log("🚀 ~ file: TransactionItem.tsx:43 ~ Messages:", discussions);
 
-  useEffect(() => {
-    console.log("1255555", dataTransaction);
-    let Disc = Object.keys(discussions).find(
-      (discId) => discId === dataTransaction.discussionId
-    );
-    console.log(
-      "🚀 ~ file: TransactionItem.tsx:52 ~ useEffect ~ Disc:",
-      Disc,
-      isClicked,
-      success
-    );
-    if (Disc && isClicked && success) {
-      console.log("12555556", { Disc });
-      router.push({
-        pathname: "/discussion",
-        params: {
-          id: Disc,
-        },
-      });
-      setIsCliked(false);
-    }
-  }, [discussions, isClicked, success]);
-
-  const dispatch: AppDispatch = useDispatch();
-  let router = useRouter();
   return (
     <View
       lightColor={color}
@@ -84,7 +68,7 @@ const TransactionItem = ({
           } else {
             router.push({
               pathname: "/formTransaction",
-              params: { id: dataTransaction?.id, type: "transaction" },
+              params: { id: dataTransaction._id, type: "transaction" },
             });
           }
         }}
@@ -186,19 +170,13 @@ const TransactionItem = ({
       </TouchableOpacity>
       <TouchableOpacity
         onPress={async () => {
-          if (dataTransaction.discussionId) {
+          if (dataTransaction.discussion) {
             router.push({
               pathname: "/discussion",
-              params: { id: dataTransaction.discussionId },
+              params: { id: dataTransaction.discussion },
             });
           } else {
-            // let discussionId =
-            dispatch(addDiscussion(dataTransaction.id));
-            console.log("discussionId", "78458454847");
-            setIsCliked(true);
-            if (success) {
-              console.log("discussionId", "4445");
-            }
+            mutate();
           }
         }}
         style={[
@@ -234,7 +212,7 @@ const TransactionItem = ({
           fontSize: moderateScale(16),
         }}
       >
-        {formatDate(dataTransaction.updatedAt)}
+        {formatDate(dataTransaction.__updatedAt)}
       </MonoText>
     </View>
   );

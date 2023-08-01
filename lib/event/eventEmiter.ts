@@ -1,14 +1,14 @@
 import UidGenerator from "../uidGenerator/uidGenerator";
 
-export type EventInfo = {
+export type EventInfo<T> = {
   event: string;
   count: number;
-  value: any;
-  lastValue: any;
+  value: T;
+  lastValue: T|null|undefined;
   uid: string;
 };
 
-export type listenerSchema = ((value: any, e?: EventInfo) => void) & {
+export type listenerSchema = (<T>(value: T, e?: EventInfo<T>) => void) & {
   uid?: string;
 };
 
@@ -86,7 +86,7 @@ class EventEmiter extends UidGenerator {
     changeRequired?: boolean
   ): EventEmiter {
     let uid = this.validatedUid(listener?.uid)
-      ? listener.uid + ""
+      ? (changeRequired ? "#" : "")+listener.uid + ""
       : (listener.uid = (changeRequired ? "#" : "") + this.generateUid());
 
     events
